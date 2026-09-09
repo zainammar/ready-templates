@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Product Promo Banner Maker</title>
+<style>
+  :root{
+    --ink:#141311;
+    --paper:#efe9df;
+    --accent:#c65a2e;
+    --line:#d8d0c2;
+    --panel:#faf7f1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* ===== Controls Panel ===== */
+  .controls{
+    width:340px;
+    min-width:340px;
+    background:var(--panel);
+    border-right:1px solid var(--line);
+    padding:28px 24px;
+    overflow-y:auto;
+  }
+  .controls h1{
+    font-size:19px;
+    margin:0 0 4px;
+    letter-spacing:.2px;
+  }
+  .controls p.sub{
+    margin:0 0 26px;
+    font-size:13px;
+    color:#6b665c;
+  }
+  .field{
+    margin-bottom:20px;
+  }
+  .field label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    margin-bottom:7px;
+    color:#3a382f;
+  }
+  .field input[type="text"]{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#fff;
+    font-size:14px;
+    font-family:inherit;
+    color:var(--ink);
+  }
+  .field input[type="text"]:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .upload-box{
+    border:1.5px dashed var(--line);
+    border-radius:8px;
+    padding:14px;
+    text-align:center;
+    cursor:pointer;
+    background:#fff;
+    transition:border-color .15s;
+    position:relative;
+  }
+  .upload-box:hover{ border-color:var(--accent); }
+  .upload-box input[type="file"]{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    cursor:pointer;
+  }
+  .upload-box .u-label{
+    font-size:12.5px;
+    color:#8a8577;
+  }
+  .thumb-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:8px;
+  }
+  .thumb-row img{
+    width:38px;
+    height:38px;
+    object-fit:cover;
+    border-radius:5px;
+    border:1px solid var(--line);
+  }
+  .thumb-row span{
+    font-size:12px;
+    color:#6b665c;
+  }
+  .range-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .range-row input[type="range"]{
+    flex:1;
+  }
+  .range-row .val{
+    font-size:12px;
+    width:44px;
+    text-align:right;
+    color:#6b665c;
+  }
+  .swatches{
+    display:flex;
+    gap:8px;
+  }
+  .swatches button{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    border:2px solid #fff;
+    box-shadow:0 0 0 1px var(--line);
+    cursor:pointer;
+    padding:0;
+  }
+  .swatches button.active{
+    box-shadow:0 0 0 2px var(--accent);
+  }
+  .divider{
+    height:1px;
+    background:var(--line);
+    margin:24px 0;
+  }
+  .hint{
+    font-size:11.5px;
+    color:#9a9484;
+    margin-top:6px;
+    line-height:1.4;
+  }
+
+  /* ===== Preview Stage ===== */
+  .stage-wrap{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px;
+    overflow:auto;
+  }
+  .stage{
+    width:900px;
+    max-width:100%;
+    aspect-ratio:16/9;
+    position:relative;
+    border-radius:14px;
+    overflow:hidden;
+    background:#2b2a26 center/cover no-repeat;
+    box-shadow:0 20px 50px rgba(20,19,17,.25);
+  }
+  .stage .scrim{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.1) 70%, rgba(0,0,0,.45) 100%);
+  }
+  .logo-mark{
+    position:absolute;
+    top:22px;
+    left:26px;
+    height:44px;
+    max-width:150px;
+    object-fit:contain;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));
+    z-index:3;
+  }
+  .logo-mark.empty{
+    height:34px;
+    padding:6px 14px;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:6px;
+    color:#fff;
+    font-size:12px;
+    letter-spacing:.5px;
+    display:flex;
+    align-items:center;
+  }
+  .product-shot{
+    position:absolute;
+    right:6%;
+    bottom:10%;
+    width:26%;
+    max-width:220px;
+    object-fit:contain;
+    filter:drop-shadow(0 14px 24px rgba(0,0,0,.45));
+    z-index:3;
+  }
+  .heading-text{
+    position:absolute;
+    left:6%;
+    top:50%;
+    transform:translateY(-50%);
+    max-width:42%;
+    color:#fff;
+    font-size:clamp(18px,3.4vw,38px);
+    font-weight:800;
+    line-height:1.25;
+    letter-spacing:.2px;
+    text-shadow:0 3px 10px rgba(0,0,0,.5);
+    z-index:3;
+  }
+  .marquee-track{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:22%;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+    background:rgba(20,19,17,.55);
+    backdrop-filter:blur(2px);
+    border-top:1px solid rgba(255,255,255,.15);
+    z-index:2;
+  }
+  .marquee-inner{
+    display:flex;
+    white-space:nowrap;
+    will-change:transform;
+    animation:scrollLTR var(--dur,14s) linear infinite;
+  }
+  .marquee-inner span{
+    padding:0 3vw;
+    font-size:clamp(16px,2.6vw,30px);
+    font-weight:700;
+    color:#fff;
+    letter-spacing:.3px;
+  }
+  @keyframes scrollLTR{
+    0%{ transform:translateX(-50%); }
+    100%{ transform:translateX(0%); }
+  }
+  .stage.paused .marquee-inner{ animation-play-state:paused; }
+
+  .download-btn{
+    margin-top:18px;
+    width:100%;
+    padding:12px;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    font-size:13.5px;
+    font-weight:600;
+    cursor:pointer;
+    letter-spacing:.3px;
+  }
+  .download-btn:hover{ background:#000; }
+  .toggle-btn{
+    margin-top:10px;
+    width:100%;
+    padding:10px;
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:13px;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <h1>Promo Banner Maker</h1>
+  <p class="sub">Text, background, logo aur product image daal ke live preview dekhein — text neeche se left to right scroll hoga.</p>
+
+  <div class="field">
+    <label for="marqueeText">Scrolling Text</label>
+    <input type="text" id="marqueeText" value="Naye collection par 30% off — abhi order karein" maxlength="120">
+  </div>
+
+  <div class="field">
+    <label for="headingText">Left-Center Text</label>
+    <input type="text" id="headingText" value="Premium Quality. Best Price." maxlength="80">
+  </div>
+
+  <div class="field">
+    <label>Text Speed</label>
+    <div class="range-row">
+      <input type="range" id="speed" min="30" max="400" step="10" value="120">
+      <span class="val" id="speedVal">120 px/s</span>
+    </div>
+    <p class="hint">Yeh actual scroll speed hai (pixels per second) — text ki length chahe jo ho, speed hamesha wahi rahegi.</p>
+  </div>
+
+  <div class="field">
+    <label>Marquee Bar Color</label>
+    <div class="swatches" id="swatches">
+      <button style="background:#141311" data-color="rgba(20,19,17,.55)" class="active"></button>
+      <button style="background:#c65a2e" data-color="rgba(198,90,46,.75)"></button>
+      <button style="background:#2c4a3e" data-color="rgba(44,74,62,.7)"></button>
+      <button style="background:#1d3f5e" data-color="rgba(29,63,94,.7)"></button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="field">
+    <label>Background Image</label>
+    <div class="upload-box">
+      <div class="u-label">Click ya drag karke background upload karein</div>
+      <input type="file" id="bgInput" accept="image/*">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Logo</label>
+    <div class="upload-box">
+      <div class="u-label">Logo upload karein (PNG transparent behtar)</div>
+      <input type="file" id="logoInput" accept="image/*">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Product Image</label>
+    <div class="upload-box">
+      <div class="u-label">Chota product shot upload karein</div>
+      <input type="file" id="productInput" accept="image/*">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <button class="toggle-btn" id="pauseBtn">Pause Animation</button>
+  <button class="download-btn" id="recordBtn">Record Video (one loop)</button>
+  <p class="hint" id="recordStatus">Record dabane par ek full text-loop record ho kar video file download ho jayegi.</p>
+  <button class="download-btn" id="downloadBtn" style="background:transparent;color:var(--ink);border:1px solid var(--line);">Download as HTML (interactive)</button>
+  <p class="hint">Yeh template browser me hi kaam karta hai — images sirf preview ke liye load hoti hain, kahin upload nahi hotin.</p>
+</div>
+
+<div class="stage-wrap">
+  <div class="stage" id="stage">
+    <div class="scrim"></div>
+    <div class="logo-mark empty" id="logoEl">YOUR LOGO</div>
+    <div class="heading-text" id="headingEl">Premium Quality. Best Price.</div>
+    <img class="product-shot" id="productEl" src="" alt="" style="display:none;">
+    <div class="marquee-track" id="marqueeTrack">
+      <div class="marquee-inner" id="marqueeInner" style="--dur:14s;">
+        <span></span><span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<canvas id="recCanvas" width="1280" height="720" style="position:fixed; left:-9999px; top:0;"></canvas>
+
+<script>
+  const stage = document.getElementById('stage');
+  const textInput = document.getElementById('marqueeText');
+  const headingInput = document.getElementById('headingText');
+  const headingEl = document.getElementById('headingEl');
+  const marqueeInner = document.getElementById('marqueeInner');
+  const spans = marqueeInner.querySelectorAll('span');
+  const speedSlider = document.getElementById('speed');
+  const speedVal = document.getElementById('speedVal');
+  const bgInput = document.getElementById('bgInput');
+  const logoInput = document.getElementById('logoInput');
+  const productInput = document.getElementById('productInput');
+  const logoEl = document.getElementById('logoEl');
+  const productEl = document.getElementById('productEl');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const swatches = document.querySelectorAll('.swatches button');
+  const marqueeTrack = document.getElementById('marqueeTrack');
+
+  function updateText(){
+    const val = textInput.value.trim() || 'Your promo text here';
+    spans.forEach(s => s.textContent = val);
+    computeDuration();
+  }
+  textInput.addEventListener('input', updateText);
+  updateText();
+
+  headingInput.addEventListener('input', () => {
+    headingEl.textContent = headingInput.value.trim() || 'Your heading text';
+  });
+
+  function computeDuration(){
+    // marquee-inner holds two identical spans back-to-back;
+    // translateX(-50%) -> translateX(0%) moves it by exactly one span's width.
+    const oneWidth = marqueeInner.scrollWidth / 2 || 1;
+    const speedPxSec = parseFloat(speedSlider.value);
+    const duration = Math.max(oneWidth / speedPxSec, 0.4);
+    marqueeInner.style.setProperty('--dur', duration + 's');
+    return duration;
+  }
+
+  speedSlider.addEventListener('input', () => {
+    speedVal.textContent = speedSlider.value + ' px/s';
+    computeDuration();
+  });
+
+  function readImage(file, cb){
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e => cb(e.target.result);
+    reader.readAsDataURL(file);
+  }
+
+  // Keep plain Image() copies of every upload for canvas-based recording
+  let bgImgObj = null, logoImgObj = null, productImgObj = null;
+  let barColor = 'rgba(20,19,17,.55)';
+
+  bgInput.addEventListener('change', e => {
+    readImage(e.target.files[0], url => {
+      stage.style.backgroundImage = `url(${url})`;
+      const img = new Image();
+      img.onload = () => bgImgObj = img;
+      img.src = url;
+    });
+  });
+
+  logoInput.addEventListener('change', e => {
+    readImage(e.target.files[0], url => {
+      const img = new Image();
+      img.src = url;
+      img.className = 'logo-mark';
+      img.id = 'logoEl';
+      logoEl.replaceWith(img);
+      const cimg = new Image();
+      cimg.onload = () => logoImgObj = cimg;
+      cimg.src = url;
+    });
+  });
+
+  productInput.addEventListener('change', e => {
+    readImage(e.target.files[0], url => {
+      productEl.src = url;
+      productEl.style.display = 'block';
+      const img = new Image();
+      img.onload = () => productImgObj = img;
+      img.src = url;
+    });
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    stage.classList.toggle('paused');
+    pauseBtn.textContent = stage.classList.contains('paused') ? 'Resume Animation' : 'Pause Animation';
+  });
+
+  swatches.forEach(btn => {
+    btn.addEventListener('click', () => {
+      swatches.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      marqueeTrack.style.background = btn.dataset.color;
+      barColor = btn.dataset.color;
+    });
+  });
+
+  // ===== Canvas-based video recording =====
+  const recCanvas = document.getElementById('recCanvas');
+  const rctx = recCanvas.getContext('2d');
+  const recordBtn = document.getElementById('recordBtn');
+  const recordStatus = document.getElementById('recordStatus');
+  let recording = false;
+  let recStartTime = 0;
+
+  function drawFrame(now){
+    const W = recCanvas.width, H = recCanvas.height;
+    rctx.clearRect(0,0,W,H);
+
+    // background
+    if(bgImgObj && bgImgObj.complete){
+      const ir = bgImgObj.width / bgImgObj.height;
+      const cr = W / H;
+      let dw, dh, dx, dy;
+      if(ir > cr){ dh = H; dw = H * ir; dx = (W - dw)/2; dy = 0; }
+      else { dw = W; dh = W / ir; dx = 0; dy = (H - dh)/2; }
+      rctx.drawImage(bgImgObj, dx, dy, dw, dh);
+    } else {
+      rctx.fillStyle = '#2b2a26';
+      rctx.fillRect(0,0,W,H);
+    }
+
+    // scrim gradient
+    const grad = rctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'rgba(0,0,0,.15)');
+    grad.addColorStop(0.3,'rgba(0,0,0,0)');
+    grad.addColorStop(0.7,'rgba(0,0,0,.1)');
+    grad.addColorStop(1,'rgba(0,0,0,.45)');
+    rctx.fillStyle = grad;
+    rctx.fillRect(0,0,W,H);
+
+    // logo
+    const logoH = H*0.087, logoTop = H*0.0435, logoLeft = W*0.029;
+    if(logoImgObj && logoImgObj.complete){
+      const lw = logoImgObj.width * (logoH/logoImgObj.height);
+      rctx.drawImage(logoImgObj, logoLeft, logoTop, Math.min(lw, W*0.17), logoH);
+    } else {
+      rctx.fillStyle = 'rgba(255,255,255,.14)';
+      rctx.fillRect(logoLeft, logoTop, W*0.14, logoH*0.85);
+      rctx.strokeStyle = 'rgba(255,255,255,.35)';
+      rctx.strokeRect(logoLeft, logoTop, W*0.14, logoH*0.85);
+      rctx.fillStyle = '#fff';
+      rctx.font = `${H*0.024}px Segoe UI, sans-serif`;
+      rctx.textBaseline = 'middle';
+      rctx.fillText('YOUR LOGO', logoLeft+14, logoTop + (logoH*0.85)/2);
+    }
+
+    // product image
+    if(productImgObj && productImgObj.complete){
+      const pw = Math.min(W*0.26, 220*(W/900));
+      const ph = pw * (productImgObj.height/productImgObj.width);
+      const px = W - W*0.06 - pw;
+      const py = H - H*0.10 - ph;
+      rctx.drawImage(productImgObj, px, py, pw, ph);
+    }
+
+    // left-center heading text (with simple word wrap)
+    const headTxt = (headingInput.value.trim() || 'Your heading text');
+    const headFontPx = Math.max(18*(W/900), Math.min(38*(W/900), W*0.034));
+    rctx.font = `800 ${headFontPx}px Segoe UI, sans-serif`;
+    rctx.fillStyle = '#fff';
+    rctx.textBaseline = 'middle';
+    const headMaxW = W*0.42;
+    const words = headTxt.split(' ');
+    const lines = [];
+    let line = '';
+    for(const w of words){
+      const test = line ? line + ' ' + w : w;
+      if(rctx.measureText(test).width > headMaxW && line){
+        lines.push(line);
+        line = w;
+      } else {
+        line = test;
+      }
+    }
+    if(line) lines.push(line);
+    const lineH = headFontPx * 1.25;
+    const totalH = lineH * lines.length;
+    const headStartY = (H/2) - (totalH/2) + lineH/2;
+    const headX = W*0.06;
+    lines.forEach((ln, i) => {
+      rctx.fillText(ln, headX, headStartY + i*lineH);
+    });
+
+    // marquee bar
+    const barH = H*0.22, barY = H - barH;
+    rctx.fillStyle = barColor;
+    rctx.fillRect(0, barY, W, barH);
+    rctx.strokeStyle = 'rgba(255,255,255,.15)';
+    rctx.beginPath();
+    rctx.moveTo(0, barY);
+    rctx.lineTo(W, barY);
+    rctx.stroke();
+
+    // scrolling text, left to right
+    const fontPx = Math.max(16*(W/900), Math.min(30*(W/900), W*0.026));
+    rctx.font = `700 ${fontPx}px Segoe UI, sans-serif`;
+    rctx.fillStyle = '#fff';
+    rctx.textBaseline = 'middle';
+    const txt = (textInput.value.trim() || 'Your promo text here');
+    const textW = rctx.measureText(txt).width;
+    const gap = W*0.12;
+    const loopW = textW + gap;
+    const speedPxSec = parseFloat(speedSlider.value) * (W/900);
+    const duration = Math.max(loopW / speedPxSec, 0.4);
+    const elapsed = ((now - recStartTime)/1000) % duration;
+    const patternX = (elapsed/duration) * loopW;
+    const startN = -1;
+    const count = Math.ceil(W/loopW) + 2;
+    for(let n = startN; n < count; n++){
+      const x = -loopW + patternX + n*loopW;
+      rctx.fillText(txt, x, barY + barH/2);
+    }
+
+    if(recording){
+      requestAnimationFrame(drawFrame);
+    }
+  }
+
+  function pickMimeType(){
+    const candidates = [
+      'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+      'video/mp4',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm'
+    ];
+    for(const c of candidates){
+      if(window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(c)) return c;
+    }
+    return '';
+  }
+
+  recordBtn.addEventListener('click', () => {
+    if(recording) return;
+    if(!window.MediaRecorder){
+      recordStatus.textContent = 'Yeh browser video recording support nahi karta. Chrome ya Edge try karein.';
+      return;
+    }
+    const mimeType = pickMimeType();
+    const stream = recCanvas.captureStream(30);
+    const options = mimeType ? { mimeType } : {};
+    let recorder;
+    try{
+      recorder = new MediaRecorder(stream, options);
+    } catch(err){
+      recordStatus.textContent = 'Recording start nahi ho saki: ' + err.message;
+      return;
+    }
+    const chunks = [];
+    recorder.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
+    recorder.onstop = () => {
+      recording = false;
+      const outType = mimeType && mimeType.includes('mp4') ? 'video/mp4' : 'video/webm';
+      const ext = outType === 'video/mp4' ? 'mp4' : 'webm';
+      const blob = new Blob(chunks, { type: outType });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `promo-banner.${ext}`;
+      a.click();
+      recordBtn.textContent = 'Record Video (one loop)';
+      recordBtn.disabled = false;
+      recordStatus.textContent = ext === 'mp4'
+        ? 'Video download ho gayi (MP4).'
+        : 'Is browser me MP4 available nahi tha, isliye WEBM me di gayi hai — ye bhi zyada tar jagah chal jati hai.';
+    };
+
+    const duration = computeDuration();
+    recStartTime = performance.now();
+    recording = true;
+    recordBtn.disabled = true;
+    recordBtn.textContent = `Recording... (${duration}s)`;
+    recordStatus.textContent = 'Recording chal rahi hai, please wait...';
+    requestAnimationFrame(drawFrame);
+    recorder.start();
+    setTimeout(() => { if(recorder.state !== 'inactive') recorder.stop(); }, duration*1000 + 150);
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    const clone = document.documentElement.cloneNode(true);
+    const controlsEl = clone.querySelector('.controls');
+    if(controlsEl) controlsEl.remove();
+    const stageWrap = clone.querySelector('.stage-wrap');
+    if(stageWrap) stageWrap.style.padding = '0';
+    const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+    const blob = new Blob([html], {type:'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'promo-banner.html';
+    a.click();
+  });
+</script>
+
+</body>
+</html>

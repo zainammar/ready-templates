@@ -235,3 +235,20 @@
     font-size:13px;
     cursor:pointer;
   }
+
+
+  /* template2 */
+  .heading-text{
+    position:absolute;
+    left:6%;
+    top:50%;
+    transform:translateY(-50%);
+    max-width:42%;
+    color:#fff;
+    font-size:clamp(18px,3.4vw,38px);
+    font-weight:800;
+    line-height:1.25;
+    letter-spacing:.2px;
+    text-shadow:0 3px 10px rgba(0,0,0,.5);
+    z-index:3;
+  }
