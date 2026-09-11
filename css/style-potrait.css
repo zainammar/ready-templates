@@ -1,5 +1,5 @@
-/* ===== Controls Panel ===== */
-.controls{
+ /* ===== Controls Panel ===== */
+ .controls{
     width:340px;
     min-width:340px;
     background:var(--panel);
@@ -131,9 +131,9 @@
     overflow:auto;
   }
   .stage{
-    width:900px;
+    width:420px;
     max-width:100%;
-    aspect-ratio:16/9;
+    aspect-ratio:9/16;
     position:relative;
     border-radius:14px;
     overflow:hidden;
@@ -175,6 +175,34 @@
     max-width:220px;
     object-fit:contain;
     filter:drop-shadow(0 14px 24px rgba(0,0,0,.45));
+    z-index:3;
+  }
+  .heading-text{
+    position:absolute;
+    left:50%;
+    top:350%;
+    transform:translateY(-50%);
+    max-width:70%;
+    color:#fff;
+    font-size:clamp(18px,3.4vw,38px);
+    font-weight:800;
+    line-height:1.25;
+    letter-spacing:.2px;
+    text-shadow:0 3px 10px rgba(0,0,0,.5);
+    z-index:3;
+  }
+  .heading-text2{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translateY(-50%);
+    max-width:70%;
+    color:#e02e2e;
+    font-size:clamp(18px,3.4vw,38px);
+    font-weight:800;
+    line-height:1.25;
+    letter-spacing:.2px;
+    text-shadow:0 3px 10px rgba(0,0,0,.5);
     z-index:3;
   }
   .marquee-track{
@@ -237,18 +265,37 @@
   }
 
 
-  /* template2 */
-  .heading-text{
-    position:absolute;
-    left:6%;
-    top:50%;
-    transform:translateY(-50%);
-    max-width:42%;
-    color:#fff;
-    font-size:clamp(18px,3.4vw,38px);
-    font-weight:800;
-    line-height:1.25;
-    letter-spacing:.2px;
-    text-shadow:0 3px 10px rgba(0,0,0,.5);
-    z-index:3;
+  /* Move Div */
+
+  #mydiv {
+
+    position: absolute;
+    z-index: 9;
+    text-align: center;
+
   }
+  
+  #mydivheader {
+
+    padding: 10px;
+    cursor: move;
+    z-index: 10;
+    color: #fff;
+  }
+
+
+
+  #mydiv2 {
+    position: absolute;
+    z-index: 9;
+    text-align: center;
+
+  }
+  
+  #mydivheader2 {
+    padding: 10px;
+    cursor: move;
+    z-index: 10;
+    color: #fff;
+  }
+

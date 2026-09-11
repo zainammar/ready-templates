@@ -32,13 +32,19 @@
   <h1>Promo Banner Maker</h1>
   <p class="sub">Text, background, logo aur product image daal ke live preview dekhein — text neeche se left to right scroll hoga.</p>
 
-
+  <div class="field">
+    <label for="marqueeText">Scrolling Text</label>
+    <input type="text" id="marqueeText" value="Naye collection par 30% off — abhi order karein" maxlength="120">
+  </div>
 
   <div class="field">
-    <label for="headingText">Drag & Drop Text One</label>
-    <input type="text" id="headingText" value="Drag & Drop Text 1" maxlength="80">
+    <label for="headingText">Left-Center Text</label>
+    <input type="text" id="headingText" value="Premium Quality. Best Price." maxlength="80">
   </div>
-  
+  <div class="field">
+    <label for="headingText2">Left-Center Text</label>
+    <input type="text" id="headingText2" value="next." maxlength="80">
+  </div>
 
   <div class="field">
     <label>Text Speed</label>
@@ -83,6 +89,7 @@
       <div class="u-label">Chota product shot upload karein</div>
       <input type="file" id="productInput" accept="image/*">
     </div>
+    <p class="hint">Preview me is image ko click karke drag se jahan chahein wahan move kar sakte hain.</p>
   </div>
 
   <div class="divider"></div>
@@ -102,8 +109,13 @@
       <div id="mydivheader"> <div class="heading-text" id="headingEl"> Drag and Drop</div></div>
      
     </div>
+    <div id="mydiv2">
+      <div id="mydivheader2"> <div class="heading-text2" id="headingEl2"> Drag and Drop</div></div>
+     
+    </div>
    
-    <img class="product-shot" id="productEl" src="" alt="" style="display:none;">
+    
+    <img class="product-shot" id="productEl" src="" alt="" draggable="false" style="display:none;">
     <div class="marquee-track" id="marqueeTrack">
       <div class="marquee-inner" id="marqueeInner" style="--dur:14s;">
         <span></span><span></span>
@@ -115,10 +127,103 @@
 <canvas id="recCanvas" width="720" height="1280" style="position:fixed; left:-9999px; top:0;"></canvas>
 
 <script>
+  //Make the DIV element draggagle:
+  dragElement(document.getElementById("mydiv"));
+  
+  function dragElement(elmnt) {
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    if (document.getElementById(elmnt.id + "header")) {
+      /* if present, the header is where you move the DIV from:*/
+      document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+    } else {
+      /* otherwise, move the DIV from anywhere inside the DIV:*/
+      elmnt.onmousedown = dragMouseDown;
+    }
+  
+    function dragMouseDown(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
+    }
+  
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // calculate the new cursor position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // set the element's new position:
+      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+  
+    function closeDragElement() {
+      /* stop moving when mouse button is released:*/
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  }
+  </script>
+  
+<script>
+//Make the DIV element draggagle:
+dragElement(document.getElementById("mydiv2"));
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "header")) {
+    /* if present, the header is where you move the DIV from:*/
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+  } else {
+    /* otherwise, move the DIV from anywhere inside the DIV:*/
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+</script>
+
+<script>
   const stage = document.getElementById('stage');
   const textInput = document.getElementById('marqueeText');
   const headingInput = document.getElementById('headingText');
   const headingEl = document.getElementById('headingEl');
+  const headingEl2 = document.getElementById('headingEl2');
   const marqueeInner = document.getElementById('marqueeInner');
   const spans = marqueeInner.querySelectorAll('span');
   const speedSlider = document.getElementById('speed');
@@ -154,6 +259,19 @@
     marqueeInner.style.setProperty('--dur', duration + 's');
     return duration;
   }
+  headingInput2.addEventListener('input', () => {
+    headingEl2.textContent = headingInput2.value.trim() || 'Your heading text';
+  });
+
+  function computeDuration(){
+    // marquee-inner holds two identical spans back-to-back;
+    // translateX(-50%) -> translateX(0%) moves it by exactly one span's width.
+    const oneWidth = marqueeInner.scrollWidth / 2 || 1;
+    const speedPxSec = parseFloat(speedSlider.value);
+    const duration = Math.max(oneWidth / speedPxSec, 0.4);
+    marqueeInner.style.setProperty('--dur', duration + 's');
+    return duration;
+  }
 
   speedSlider.addEventListener('input', () => {
     speedVal.textContent = speedSlider.value + ' px/s';
@@ -169,6 +287,7 @@
 
   // Keep plain Image() copies of every upload for canvas-based recording
   let bgImgObj = null, logoImgObj = null, productImgObj = null;
+  let productPosPct = null; // {leftFrac, topFrac} once user drags it; null = default corner spot
   let barColor = 'rgba(20,19,17,.55)';
 
   bgInput.addEventListener('change', e => {
@@ -201,6 +320,42 @@
       img.onload = () => productImgObj = img;
       img.src = url;
     });
+  });
+
+  // ===== Drag to reposition the product image =====
+  let dragging = false, dragOffsetX = 0, dragOffsetY = 0;
+
+  productEl.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    dragging = true;
+    productEl.setPointerCapture(e.pointerId);
+    const prodRect = productEl.getBoundingClientRect();
+    dragOffsetX = e.clientX - prodRect.left;
+    dragOffsetY = e.clientY - prodRect.top;
+  });
+
+  productEl.addEventListener('pointermove', e => {
+    if(!dragging) return;
+    const stageRect = stage.getBoundingClientRect();
+    const prodRect = productEl.getBoundingClientRect();
+    let newLeft = e.clientX - stageRect.left - dragOffsetX;
+    let newTop = e.clientY - stageRect.top - dragOffsetY;
+    const maxLeft = stageRect.width - prodRect.width;
+    const maxTop = stageRect.height - prodRect.height;
+    newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+    newTop = Math.max(0, Math.min(newTop, maxTop));
+    const leftFrac = newLeft / stageRect.width;
+    const topFrac = newTop / stageRect.height;
+    productEl.style.left = (leftFrac*100) + '%';
+    productEl.style.top = (topFrac*100) + '%';
+    productEl.style.right = 'auto';
+    productEl.style.bottom = 'auto';
+    productPosPct = { leftFrac, topFrac };
+  });
+
+  productEl.addEventListener('pointerup', e => {
+    dragging = false;
+    productEl.releasePointerCapture(e.pointerId);
   });
 
   pauseBtn.addEventListener('click', () => {
@@ -268,12 +423,18 @@
       rctx.fillText('YOUR LOGO', logoLeft+14, logoTop + (logoH*0.85)/2);
     }
 
-    // product image
+    // product image (uses dragged position if the user moved it)
     if(productImgObj && productImgObj.complete){
       const pw = Math.min(W*0.26, 220*(W/900));
       const ph = pw * (productImgObj.height/productImgObj.width);
-      const px = W - W*0.06 - pw;
-      const py = H - H*0.10 - ph;
+      let px, py;
+      if(productPosPct){
+        px = productPosPct.leftFrac * W;
+        py = productPosPct.topFrac * H;
+      } else {
+        px = W - W*0.06 - pw;
+        py = H - H*0.10 - ph;
+      }
       rctx.drawImage(productImgObj, px, py, pw, ph);
     }
 
@@ -413,52 +574,6 @@
     a.click();
   });
 </script>
-<!-- Move Div -->
- 
-<script>
-  //Make the DIV element draggagle:
-  dragElement(document.getElementById("mydiv"));
-  
-  function dragElement(elmnt) {
-    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    if (document.getElementById(elmnt.id + "header")) {
-      /* if present, the header is where you move the DIV from:*/
-      document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-    } else {
-      /* otherwise, move the DIV from anywhere inside the DIV:*/
-      elmnt.onmousedown = dragMouseDown;
-    }
-  
-    function dragMouseDown(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // get the mouse cursor position at startup:
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.onmouseup = closeDragElement;
-      // call a function whenever the cursor moves:
-      document.onmousemove = elementDrag;
-    }
-  
-    function elementDrag(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // calculate the new cursor position:
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      // set the element's new position:
-      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    }
-  
-    function closeDragElement() {
-      /* stop moving when mouse button is released:*/
-      document.onmouseup = null;
-      document.onmousemove = null;
-    }
-  }
-  </script
+
 </body>
 </html>
